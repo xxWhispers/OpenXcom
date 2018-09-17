@@ -50,6 +50,17 @@ int ModLuaScript::Load()
 
     // TODO: add in our own library
 
+    // load the file
+    std::string full_filename = getModIfo().getPath() + "/" + getFilename();
+    int error = luaL_loadfile(_luaState, full_filename.c_str());
+
+    if(error)
+    {
+        Log(LOG_ERROR) << lua_tostring(_luaState, -1);
+        lua_pop(_luaState, 1);  /* pop error message from the stack */
+        Unload();
+    }
+
 
     return 0;
 }
@@ -61,16 +72,6 @@ int ModLuaScript::Run()
     Log(LOG_INFO) << "   mod '" << getModIfo().getId() << "'";
     Log(LOG_INFO) << "   path '" << getModIfo().getPath() << "'";
 
-    // load the file
-    std::string full_filename = getModIfo().getPath() + "/" + getFilename();
-    int error = luaL_loadfile(_luaState, full_filename.c_str());
-
-    if(error)
-    {
-        Log(LOG_ERROR) << lua_tostring(_luaState, -1);
-        lua_pop(_luaState, 1);  /* pop error message from the stack */
-        Unload();
-    }
 
     return 0;
 }
