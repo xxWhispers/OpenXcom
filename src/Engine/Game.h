@@ -95,6 +95,10 @@ public:
 	Mod *getMod() const;
 	/// Loads the mods specified in the game options.
 	void loadMods();
+    /// Loads the scripts specified in the mods.
+    void loadScripts();
+    /// Unloads the scripts specified in the mods.
+    void unloadScripts();
 	/// Sets whether the mouse cursor is activated.
 	void setMouseActive(bool active);
 	/// Returns whether current state is the param state

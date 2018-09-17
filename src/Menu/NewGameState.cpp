@@ -170,6 +170,11 @@ void NewGameState::btnOkClick(Action *)
 	_game->setState(gs);
 	gs->init();
 	_game->pushState(new BuildNewBaseState(_game->getSavedGame()->getBases()->back(), gs->getGlobe(), true));
+
+	// and load the mod scripts
+	Log(LOG_INFO) << "Loading scripts...";
+	_game->loadScripts();
+	Log(LOG_INFO) << "Scripts loaded successfully.";
 }
 
 /**

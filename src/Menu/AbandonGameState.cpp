@@ -113,6 +113,7 @@ void AbandonGameState::btnYesClick(Action *)
 
 		_game->setState(new MainMenuState);
 		_game->setSavedGame(0);
+		_game->unloadScripts();
 	}
 	else
 	{

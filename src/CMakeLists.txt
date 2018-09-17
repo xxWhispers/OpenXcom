@@ -280,6 +280,7 @@ set ( mod_src
   Mod/MapDataSet.cpp
   Mod/MapScript.cpp
   Mod/Mod.cpp
+  Mod/ModLuaScript.cpp
   Mod/Polygon.cpp
   Mod/Polyline.cpp
   Mod/RuleAlienMission.cpp
@@ -523,7 +524,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES FreeBSD OR ${CMAKE_SYSTEM_NAME} MATCHES NetBSD 
   set ( system_libs -lexecinfo )
 endif ()
 
-target_link_libraries ( openxcom ${system_libs} ${SDLIMAGE_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLGFX_LIBRARY} ${SDL_LIBRARY} ${OPENGL_gl_LIBRARY} debug ${YAMLCPP_LIBRARY_DEBUG} optimized ${YAMLCPP_LIBRARY} ${LUA_LIBRARIES} )
+target_link_libraries ( openxcom ${system_libs} ${SDLIMAGE_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLGFX_LIBRARY} ${SDL_LIBRARY} ${OPENGL_gl_LIBRARY} debug ${YAMLCPP_LIBRARY_DEBUG} optimized ${YAMLCPP_LIBRARY} ${LUA_LIBRARIES} ${CMAKE_DL_LIBS} )
 
 # Pack libraries into bundle and link executable appropriately
 if ( APPLE AND CREATE_BUNDLE )

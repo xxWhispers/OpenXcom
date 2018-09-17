@@ -89,6 +89,8 @@ class ModScriptGlobal;
 class ScriptParserBase;
 class ScriptGlobal;
 struct StatAdjustment;
+
+class ModLuaScript;
 namespace FileMap {
 	class FileModInfo;
 }
@@ -214,8 +216,10 @@ private:
 	size_t _soundOffsetBattle = 0;
 	size_t _soundOffsetGeo = 0;
 
+	std::vector<ModLuaScript*> _luaScripts;
+
 	/// Loads a ruleset from a YAML file.
-	void loadFile(const std::string &filename, ModScript &parsers);
+	void loadFile(const FileMap::FileModInfo& modInfo, const std::string &filename, ModScript &parsers);
 	/// Loads a ruleset element.
 	template <typename T>
 	T *loadRule(const YAML::Node &node, std::map<std::string, T*> *map, std::vector<std::string> *index = 0, const std::string &key = "type") const;
@@ -233,7 +237,7 @@ private:
 	/// Creates a transparency lookup table for a given palette.
 	void createTransparencyLUT(Palette *pal);
 	/// Loads a specified mod content.
-	void loadMod(const std::vector<std::string> &rulesetFiles, size_t modIdx, ModScript &parsers);
+	void loadMod(const FileMap::FileModInfo& modInfo, size_t modIdx, ModScript &parsers);
 	/// Loads resources from vanilla.
 	void loadVanillaResources();
 	/// Loads resources from extra rulesets.
@@ -242,6 +246,9 @@ private:
 	void modResources();
 	/// Sorts all our lists according to their weight.
 	void sortLists();
+	/// Registers a lua script for a mod
+    void registerLuaScript(const FileMap::FileModInfo &info, const std::string& file_relative_path);
+
 public:
 	static int DOOR_OPEN;
 	static int SLIDING_DOOR_OPEN;
@@ -636,6 +643,8 @@ public:
 	StatAdjustment *getStatAdjustment(int difficulty);
 	int getDefeatScore() const;
 	int getDefeatFunds() const;
+
+	const std::vector<ModLuaScript*>& getLuaScripts() const { return _luaScripts; }
 };
 
 }

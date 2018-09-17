@@ -193,7 +193,13 @@ void LoadGameState::think()
 					_game->getSavedGame()->getSavedBattle()->setBattleState(bs);
 				}
 			}
-		}
+
+			// with the save game now loaded, we need to start up the lua contexts for mods
+			//	that have scripts
+            Log(LOG_INFO) << "Loading scripts...";
+            _game->loadScripts();
+            Log(LOG_INFO) << "Scripts loaded successfully.";
+        }
 		catch (Exception &e)
 		{
 			Log(LOG_ERROR) << e.what();

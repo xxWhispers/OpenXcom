@@ -95,6 +95,7 @@
 #include "RuleVideo.h"
 #include "RuleConverter.h"
 #include "RuleSoldierTransformation.h"
+#include "ModLuaScript.h"
 
 namespace OpenXcom
 {
@@ -620,6 +621,11 @@ Mod::~Mod()
 	{
 		delete i->second;
 	}
+	for(std::vector<ModLuaScript*>::iterator i = _luaScripts.begin(); i != _luaScripts.end(); ++i)
+	{
+		(*i)->Unload();
+		delete (*i);
+	}
 }
 
 /**
@@ -971,7 +977,7 @@ void Mod::loadAll(const std::vector< FileMap::FileModInfo > &mods)
 		_scriptGlobal->setMod((int)modOffsets[i]);
 		try
 		{
-			loadMod(mods[i].getRuleFiles(), modOffsets[i], parser);
+			loadMod(mods[i], modOffsets[i], parser);
 		}
 		catch (Exception &e)
 		{
@@ -1078,16 +1084,16 @@ void Mod::loadAll(const std::vector< FileMap::FileModInfo > &mods)
  * @param modIdx Mod index number.
  * @param parsers Object with all avaiable parser.
  */
-void Mod::loadMod(const std::vector<std::string> &rulesetFiles, size_t modIdx, ModScript &parsers)
+void Mod::loadMod(const FileMap::FileModInfo& modInfo, size_t modIdx, ModScript &parsers)
 {
 	_modOffset = 1000 * modIdx;
 
-	for (std::vector<std::string>::const_iterator i = rulesetFiles.begin(); i != rulesetFiles.end(); ++i)
+	for (std::vector<std::string>::const_iterator i = modInfo.getRuleFiles().begin(); i != modInfo.getRuleFiles().end(); ++i)
 	{
 		Log(LOG_VERBOSE) << "- " << *i;
 		try
 		{
-			loadFile(*i, parsers);
+			loadFile(modInfo, *i, parsers);
 		}
 		catch (YAML::Exception &e)
 		{
@@ -1173,7 +1179,7 @@ void Mod::loadMod(const std::vector<std::string> &rulesetFiles, size_t modIdx, M
  * @param filename YAML filename.
  * @param parsers Object with all avaiable parser.
  */
-void Mod::loadFile(const std::string &filename, ModScript &parsers)
+void Mod::loadFile(const FileMap::FileModInfo& modInfo, const std::string &filename, ModScript &parsers)
 {
 	YAML::Node doc = YAML::LoadFile(filename);
 
@@ -1817,6 +1823,18 @@ void Mod::loadFile(const std::string &filename, ModScript &parsers)
 		_maxDynamicLightDistance = lighting["maxDynamic"].as<int>(_maxDynamicLightDistance);
 		_enhancedLighting = lighting["enhanced"].as<int>(_enhancedLighting);
 	}
+
+
+    if (doc["game"])
+    {
+        const YAML::Node &game = doc["game"];
+        if(game["script"])
+        {
+            std::string scriptFile = game["script"].as<std::string>();
+            registerLuaScript(modInfo, scriptFile);
+        }
+    }
+
 }
 
 /**
@@ -4412,6 +4430,18 @@ void Mod::ScriptRegister(ScriptParserBase *parser)
 	mod.add<&Mod::getMaxDarknessToSeeUnits>("getMaxDarknessToSeeUnits");
 	mod.add<&Mod::getMaxViewDistance>("getMaxViewDistance");
 	mod.add<&getSmokeReduction>("getSmokeReduction");
+}
+
+/**
+ * Register a lua script with the engine. It will then be loaded and executed once a new game
+ * is started or when a save game is loaded.
+ * @param info
+ * @param file_relative_path
+ */
+void Mod::registerLuaScript(const FileMap::FileModInfo &info, const std::string& file_relative_path) {
+        ModLuaScript* newScript;
+        newScript = new ModLuaScript(info, file_relative_path);
+		_luaScripts.push_back(newScript);
 }
 
 }
