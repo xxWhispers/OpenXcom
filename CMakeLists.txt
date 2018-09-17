@@ -72,6 +72,8 @@ if ( IS_DIRECTORY ${DEPS_DIR} )
 else ( )
   find_package ( SDL2 COMPONENTS mixer gfx image)
   find_package ( Yaml_cpp 0.5.0)
+  find_package ( LUA )
+
   set ( YAMLCPP_LIBRARY_DEBUG ${YAMLCPP_LIBRARY} )
 
   if ( NOT SDL_FOUND )
@@ -106,11 +108,20 @@ else ( )
     message ( FATAL_ERROR "Can't find yaml-cpp which is required" )
   else ()
     include_directories ( ${YAMLCPP_INCLUDE_DIR} )
-    message ( "found yaml-cpp(${YAMLCPP_LIBRARY_DIRS}:${YAMLCPP_INCLUDE_DIR})" )
+    message ( "found yaml-cpp ${PC_YAMLCPP_VERSION} (${YAMLCPP_LIBRARY_DIRS}:${YAMLCPP_INCLUDE_DIR})" )
   endif ( NOT YAMLCPP_FOUND )
+
+  if ( NOT LUA_FOUND )
+    message ( FATAL_ERROR "Can't find LUA which is required" )
+  else ()
+    include_directories ( ${LUA_INCLUDE_DIR} )
+    message ( "found LUA ${LUA_VERSION_STRING} (${LUA_LIBRARIES}:${LUA_INCLUDE_DIR})" )
+  endif ()
+
 endif()
 
 # Find OpenGL
+set ( OpenGL_GL_PREFERENCE LEGACY )
 find_package ( OpenGL )
 if ( NOT OPENGL_FOUND )
   message ( WARNING "Can't find OpenGL; how does that even happen?\n"
