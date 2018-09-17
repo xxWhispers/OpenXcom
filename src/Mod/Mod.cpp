@@ -944,7 +944,7 @@ int Mod::getOffset(int id, int max) const
  * Loads a list of mods specified in the options.
  * @param mods List of <modId, rulesetFiles> pairs.
  */
-void Mod::loadAll(const std::vector< std::pair< std::string, std::vector<std::string> > > &mods)
+void Mod::loadAll(const std::vector< FileMap::FileModInfo > &mods)
 {
 	ModScript parser{ _scriptGlobal, this };
 
@@ -955,8 +955,8 @@ void Mod::loadAll(const std::vector< std::pair< std::string, std::vector<std::st
 	for (size_t i = 0; mods.size() > i; ++i)
 	{
 		modOffsets[i] = offset;
-		_scriptGlobal->addMod(mods[i].first, (int)offset);
-		auto it = Options::getModInfos().find(mods[i].first);
+		_scriptGlobal->addMod(mods[i].getId(), (int)offset);
+		auto it = Options::getModInfos().find(mods[i].getId());
 		if (it != Options::getModInfos().end())
 		{
 			offset += it->second.getReservedSpace();
@@ -971,11 +971,11 @@ void Mod::loadAll(const std::vector< std::pair< std::string, std::vector<std::st
 		_scriptGlobal->setMod((int)modOffsets[i]);
 		try
 		{
-			loadMod(mods[i].second, modOffsets[i], parser);
+			loadMod(mods[i].getRuleFiles(), modOffsets[i], parser);
 		}
 		catch (Exception &e)
 		{
-			const std::string &modId = mods[i].first;
+			const std::string &modId = mods[i].getId();
 			Log(LOG_WARNING) << "disabling mod with invalid ruleset: " << modId;
 			std::vector<std::pair<std::string, bool> >::iterator it =
 				std::find(Options::mods.begin(), Options::mods.end(),

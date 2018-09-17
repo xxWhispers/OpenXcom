@@ -30,6 +30,28 @@ namespace OpenXcom
  */
 namespace FileMap
 {
+
+	/// Helper class to map mods to file locations
+	class FileModInfo
+	{
+	protected:
+		std::string _id;
+		std::string _path;
+
+		std::vector<std::string> _ruleFiles;
+	public:
+		FileModInfo(std::string id, std::string path) : _id(id), _path(path) { }
+		~FileModInfo() { }
+
+		const std::string& getId() const { return _id; }
+		const std::string& getPath() const { return _path; }
+
+		void addRuleFile(std::string filename) { _ruleFiles.push_back(filename); }
+
+		const std::vector<std::string>& getRuleFiles() const { return _ruleFiles; }
+	};
+
+
 	/// Gets the real filesystem path for a data file when given a relative (case insensitive) path,
 	/// like "units/zombie.pck".  If the file has not been mapped via the load() function, the input
 	/// path is returned verbatim (for use in error messages when the file is ultimately not found).
@@ -46,7 +68,7 @@ namespace FileMap
 
 	/// Returns the ruleset files found, grouped by mod, while mapping resources.  The highest-priority mod
 	/// will be last in the returned vector.
-	const std::vector<std::pair<std::string, std::vector<std::string> > > &getRulesets();
+	const std::vector<FileModInfo> &getRulesets();
 
 	/// clears FileMap state
 	void clear();

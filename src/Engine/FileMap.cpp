@@ -28,7 +28,8 @@ namespace OpenXcom
 namespace FileMap
 {
 
-static std::vector<std::pair<std::string, std::vector<std::string> > > _rulesets;
+
+static std::vector<FileModInfo> _rulesets;
 static std::map<std::string, std::string> _resources;
 static std::map< std::string, std::set<std::string> > _vdirs;
 static std::set<std::string> _emptySet;
@@ -91,7 +92,7 @@ std::set<std::string> _filterFiles(const T &files, const std::string &ext)
 std::set<std::string> filterFiles(const std::vector<std::string> &files, const std::string &ext) { return _filterFiles(files, ext); }
 std::set<std::string> filterFiles(const std::set<std::string>    &files, const std::string &ext) { return _filterFiles(files, ext); }
 
-const std::vector<std::pair<std::string, std::vector<std::string> > > &getRulesets()
+const std::vector<FileModInfo> &getRulesets()
 {
 	return _rulesets;
 }
@@ -116,13 +117,14 @@ static void _mapFiles(const std::string &modId, const std::string &basePath,
 
 	if (!ignoreMods && !rulesetFiles.empty())
 	{
-		_rulesets.insert(_rulesets.begin(), std::pair<std::string, std::vector<std::string> >(modId, std::vector<std::string>()));
+		FileModInfo modInfo(modId, basePath);
 		for (std::set<std::string>::iterator i = rulesetFiles.begin(); i != rulesetFiles.end(); ++i)
 		{
 			std::string fullpath = fullDir + "/" + *i;
-			Log(LOG_VERBOSE) << "  recording ruleset: " << fullpath;
-			_rulesets.front().second.push_back(fullpath);
+			Log(LOG_INFO) << "  recording ruleset: " << fullpath;
+			modInfo.addRuleFile(fullpath);
 		}
+		_rulesets.insert(_rulesets.begin(), modInfo);
 	}
 
 	for (std::vector<std::string>::iterator i = files.begin(); i != files.end(); ++i)

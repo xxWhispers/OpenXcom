@@ -89,6 +89,9 @@ class ModScriptGlobal;
 class ScriptParserBase;
 class ScriptGlobal;
 struct StatAdjustment;
+namespace FileMap {
+	class FileModInfo;
+}
 
 /**
  * Contains all the game-specific static data that never changes
@@ -327,7 +330,7 @@ public:
 	int getOffset(int id, int max) const;
 
 	/// Loads a list of mods.
-	void loadAll(const std::vector< std::pair< std::string, std::vector<std::string> > > &mods);
+	void loadAll(const std::vector< FileMap::FileModInfo > &mods);
 	/// Generates the starting saved game.
 	SavedGame *newSave() const;
 	/// Gets the ruleset for a country type.
