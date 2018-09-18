@@ -5,6 +5,7 @@
 #include "ModLuaScript.h"
 #include "../Engine/Logger.h"
 #include "../Engine/FileMap.h"
+#include "Lua/LuaApi.h"
 
 extern "C" {
 
@@ -31,7 +32,7 @@ ModLuaScript::~ModLuaScript()
 }
 
 // Prepare the Lua context and load the script
-int ModLuaScript::Load()
+int ModLuaScript::Load(Game* game)
 {
     Log(LOG_INFO) << "Loading script '" << getFilename() << "'";
     Log(LOG_INFO) << "   mod '" << getModIfo().getId() << "'";
@@ -48,7 +49,7 @@ int ModLuaScript::Load()
     // get the default lua libraries
     luaL_openlibs(_luaState);
 
-    // TODO: add in our own library
+    Lua::loadXcomLuaLib(_luaState, game);
 
     // load the file
     std::string full_filename = getModIfo().getPath() + "/" + getFilename();
@@ -68,10 +69,12 @@ int ModLuaScript::Load()
 // Run the script
 int ModLuaScript::Run()
 {
+    if(_luaState == nullptr) { return -1; }
     Log(LOG_INFO) << "Running script '" << getFilename() << "'";
     Log(LOG_INFO) << "   mod '" << getModIfo().getId() << "'";
     Log(LOG_INFO) << "   path '" << getModIfo().getPath() << "'";
 
+    lua_pcall(_luaState, 0, 0, 0);
 
     return 0;
 }
@@ -86,7 +89,7 @@ int ModLuaScript::Unload()
     if(_luaState == nullptr)
     {
         Log(LOG_ERROR) << "Can not release a lua state that has never been initialised";
-        return -1;
+        return 0;   //it's not REALLY an error, but a performance issue if called too frequently
     }
 
     lua_close(_luaState);

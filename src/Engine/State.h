@@ -55,9 +55,11 @@ protected:
 
 	SDL_Color _palette[256];
 	Uint8 _cursorColor;
-public:
+
 	/// Creates a new state linked to a game.
 	State();
+
+public:
 	/// Cleans up the state.
 	virtual ~State();
 	/// Set interface rules.

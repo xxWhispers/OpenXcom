@@ -315,6 +315,9 @@ set ( mod_src
   Mod/Texture.cpp
   Mod/UfoTrajectory.cpp
   Mod/Unit.cpp
+  Mod/Lua/LuaApi.cpp
+  Mod/Lua/LuaGame.cpp
+  Mod/Lua/LuaGeoscape.cpp
 )
 
 set ( savegame_src

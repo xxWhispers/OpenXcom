@@ -575,7 +575,7 @@ void Game::loadScripts()
 	{
 		ModLuaScript* script = (*i);
 
-		int ret = script->Load();
+		int ret = script->Load(this);
 
 		if(ret != 0)
 		{

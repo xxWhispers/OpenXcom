@@ -18,40 +18,31 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
-
 // predeclaration
 typedef struct lua_State lua_State;
+
 
 namespace OpenXcom
 {
 
 class Game;
-namespace FileMap {
-    class FileModInfo;
-}
 
-class ModLuaScript
+namespace Lua
 {
-private:
-    const FileMap::FileModInfo& _modInfo;
-    const std::string _file_relative_path;
 
-    lua_State* _luaState;
+/// Given a lua context, insert the "xcom" lua API bindings
+void loadXcomLuaLib(lua_State* luaState, Game* game);
 
-public:
-    ModLuaScript(const FileMap::FileModInfo& modInfo, const std::string& file_relative_path);
-    ~ModLuaScript();
+/// Helpers
 
-    // Prepare the Lua context and load the script.
-    int Load(Game* game);
-    // Run the script
-    int Run();
-    // Cleanup and unload the script and safely shut down the Lua context.
-    int Unload();
+/// Given a lua context, insert the "xcom.game" lua API bindings
+void loadXcomGameLuaLib(lua_State* luaState, Game* game);
+/// Given a lua context, insert the "xcom.geoscape" lua API bindings
+void loadXcomGeoscapeLuaLib(lua_State* luaState);
 
-    const std::string& getFilename() const { return _file_relative_path; }
-    const FileMap::FileModInfo& getModIfo() const { return _modInfo; }
-};
+/// helper function to load the game object from the lua state
+Game* getGame(lua_State* luaState);
 
 }
+}
+
