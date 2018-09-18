@@ -318,6 +318,7 @@ set ( mod_src
   Mod/Lua/LuaApi.cpp
   Mod/Lua/LuaGame.cpp
   Mod/Lua/LuaGeoscape.cpp
+  Mod/Lua/LuaInterface.cpp
 )
 
 set ( savegame_src

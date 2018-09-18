@@ -16,17 +16,12 @@ extern "C" {
 namespace OpenXcom {
 namespace Lua {
 
-GeoscapeState* getGeoscape(lua_State* luaState)
-{
-    Game* game = getGame(luaState);
-    if(game != nullptr)
-    {
-        //walk up the state stack to get the topmost state. That's where you'll find the goescape state
-    }
-}
-
 static int lua_geoscapeRegister5SecCallback(lua_State* luaState)
 {
+    Game* game = getGame(luaState);
+
+
+    game->getScript()->RegisterCallback()
     return 0;
 }
 
