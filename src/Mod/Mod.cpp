@@ -95,7 +95,7 @@
 #include "RuleVideo.h"
 #include "RuleConverter.h"
 #include "RuleSoldierTransformation.h"
-#include "ModLuaScript.h"
+#include "Lua/LuaApi.h"
 
 namespace OpenXcom
 {
@@ -299,7 +299,9 @@ Mod::Mod() :
 	_defeatScore(0), _defeatFunds(0), _startingTime(6, 1, 1, 1999, 12, 0, 0), _startingDifficulty(0),
 	_baseDefenseMapFromLocation(0), _pediaReplaceCraftFuelWithRangeType(-1),
 	_facilityListOrder(0), _craftListOrder(0), _itemCategoryListOrder(0), _itemListOrder(0),
-	_researchListOrder(0),  _manufactureListOrder(0), _transformationListOrder(0), _ufopaediaListOrder(0), _invListOrder(0), _soldierListOrder(0), _modOffset(0)
+	_researchListOrder(0),  _manufactureListOrder(0), _transformationListOrder(0), _ufopaediaListOrder(0), _invListOrder(0), _soldierListOrder(0), _modOffset(0),
+
+    _luaApi(new Lua::LuaApi())
 {
 	_muteMusic = new Music();
 	_muteSound = new Sound();
@@ -621,11 +623,8 @@ Mod::~Mod()
 	{
 		delete i->second;
 	}
-	for(std::vector<ModLuaScript*>::iterator i = _luaScripts.begin(); i != _luaScripts.end(); ++i)
-	{
-		(*i)->Unload();
-		delete (*i);
-	}
+
+	delete _luaApi;
 }
 
 /**
@@ -4442,9 +4441,7 @@ void Mod::ScriptRegister(ScriptParserBase *parser)
  * @param file_relative_path
  */
 void Mod::registerLuaScript(const FileMap::FileModInfo &info, const std::string& file_relative_path) {
-        ModLuaScript* newScript;
-        newScript = new ModLuaScript(info, file_relative_path);
-		_luaScripts.push_back(newScript);
+    _luaApi->registerScript(info, file_relative_path);
 }
 
 }

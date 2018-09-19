@@ -280,7 +280,6 @@ set ( mod_src
   Mod/MapDataSet.cpp
   Mod/MapScript.cpp
   Mod/Mod.cpp
-  Mod/ModLuaScript.cpp
   Mod/Polygon.cpp
   Mod/Polyline.cpp
   Mod/RuleAlienMission.cpp
@@ -315,6 +314,7 @@ set ( mod_src
   Mod/Texture.cpp
   Mod/UfoTrajectory.cpp
   Mod/Unit.cpp
+  Mod/Lua/LuaScript.cpp
   Mod/Lua/LuaApi.cpp
   Mod/Lua/LuaGame.cpp
   Mod/Lua/LuaGeoscape.cpp

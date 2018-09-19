@@ -1957,6 +1957,8 @@ void GeoscapeState::time30Minutes()
  */
 void GeoscapeState::time1Hour()
 {
+	_game->getMod()->getLuaApi()->getGeoscapeBindings().execute1HourCallbacks();
+
 	// Handle craft maintenance
 	for (std::vector<Base*>::iterator i = _game->getSavedGame()->getBases()->begin(); i != _game->getSavedGame()->getBases()->end(); ++i)
 	{

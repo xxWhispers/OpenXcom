@@ -39,7 +39,7 @@
 #include "FileMap.h"
 #include "../Menu/TestState.h"
 #include <algorithm>
-#include "../Mod/ModLuaScript.h"
+#include "../Mod/Lua/LuaScript.h"
 
 namespace OpenXcom
 {
@@ -570,33 +570,8 @@ void Game::loadMods()
  */
 void Game::loadScripts()
 {
-	const std::vector<ModLuaScript*>& scripts = _mod->getLuaScripts();
-	for(std::vector<ModLuaScript*>::const_iterator i = scripts.begin(); i != scripts.end(); ++i)
-	{
-		ModLuaScript* script = (*i);
-
-		int ret = script->Load(this);
-
-		if(ret != 0)
-		{
-			Log(LOG_ERROR) << "Unable to load script '" << script->getFilename() << "'";
-			Log(LOG_ERROR) << "   mod '" << script->getModIfo().getId() << "'";
-			Log(LOG_ERROR) << "   path '" << script->getModIfo().getPath() << "'";
-			continue;
-		}
-
-		ret = script->Run();
-
-		if(ret != 0)
-		{
-			Log(LOG_ERROR) << "Unable to run script '" << script->getFilename() << "'";
-			Log(LOG_ERROR) << "   mod '" << script->getModIfo().getId() << "'";
-			Log(LOG_ERROR) << "   path '" << script->getModIfo().getPath() << "'";
-			continue;
-		}
-
-
-	}
+	getMod()->getLuaApi()->loadScripts(this);
+	getMod()->getLuaApi()->runScripts();
 }
 
 /**
@@ -604,20 +579,7 @@ void Game::loadScripts()
  */
 void Game::unloadScripts()
 {
-	const std::vector<ModLuaScript*>& scripts = _mod->getLuaScripts();
-	for(std::vector<ModLuaScript*>::const_iterator i = scripts.begin(); i != scripts.end(); ++i)
-	{
-		ModLuaScript *script = (*i);
-
-		int ret = script->Unload();
-		if (ret != 0)
-		{
-			Log(LOG_ERROR) << "Problem unloading script '" << script->getFilename() << "'";
-			Log(LOG_ERROR) << "   mod '" << script->getModIfo().getId() << "'";
-			Log(LOG_ERROR) << "   path '" << script->getModIfo().getPath() << "'";
-			continue;
-		}
-	}
+	getMod()->getLuaApi()->unloadScripts();
 }
 
 

@@ -18,6 +18,8 @@
  */
 
 #include "LuaApi.h"
+#include "LuaScript.h"
+#include "../../Engine/FileMap.h"
 #include "../../Engine/Logger.h"
 #include <string>
 
@@ -32,21 +34,89 @@ extern "C" {
 namespace OpenXcom {
 namespace Lua {
 
-
-void loadXcomLuaLib(lua_State *luaState, Game* game)
+LuaApi::LuaApi()
 {
-    //get the global state
-    lua_pushglobaltable(luaState);
 
-    lua_newtable(luaState); //begin "xcom" table
-
-    loadXcomGameLuaLib(luaState, game);
-    loadXcomGeoscapeLuaLib(luaState);
-
-    lua_setglobal(luaState, "xcom"); //end "xcom" table
-
-    lua_pop(luaState, 1);
 }
+
+LuaApi::~LuaApi()
+{
+    for(std::vector<LuaScript*>::const_iterator i = _luaScripts.begin(); i != _luaScripts.end(); ++i)
+    {
+        delete (*i);
+    }
+}
+
+/// Adds a script to be run
+void LuaApi::registerScript(const FileMap::FileModInfo &info, const std::string& file_relative_path)
+{
+    Lua::LuaScript* newScript;
+    newScript = new Lua::LuaScript(info, file_relative_path);
+    _luaScripts.push_back(newScript);
+}
+
+
+/// Load all the registered scripts
+int LuaApi::loadScripts(Game* game)
+{
+    for(std::vector<LuaScript*>::const_iterator i = _luaScripts.begin(); i != _luaScripts.end(); ++i)
+    {
+        LuaScript* script = (*i);
+
+        int ret = script->Load(game);
+
+        if(ret != 0)
+        {
+            Log(LOG_ERROR) << "Unable to load script '" << script->getFilename() << "'";
+            Log(LOG_ERROR) << "   mod '" << script->getModIfo().getId() << "'";
+            Log(LOG_ERROR) << "   path '" << script->getModIfo().getPath() << "'";
+            continue;
+        }
+    }
+    return 0;
+}
+
+/// Run all the loaded scripts
+int LuaApi::runScripts()
+{
+    for(std::vector<LuaScript*>::const_iterator i = _luaScripts.begin(); i != _luaScripts.end(); ++i)
+    {
+        _currentScript = (*i);
+
+        int ret = _currentScript->Run();
+
+        if(ret != 0)
+        {
+            Log(LOG_ERROR) << "Unable to run script '" << _currentScript->getFilename() << "'";
+            Log(LOG_ERROR) << "   mod '" << _currentScript->getModIfo().getId() << "'";
+            Log(LOG_ERROR) << "   path '" << _currentScript->getModIfo().getPath() << "'";
+            continue;
+        }
+
+        _currentScript = nullptr;
+    }
+    return 0;
+}
+
+/// Unload all the loaded scripts
+int LuaApi::unloadScripts()
+{
+    for(std::vector<LuaScript*>::const_iterator i = _luaScripts.begin(); i != _luaScripts.end(); ++i)
+    {
+        LuaScript *script = (*i);
+
+        int ret = script->Unload();
+        if (ret != 0)
+        {
+            Log(LOG_ERROR) << "Problem unloading script '" << script->getFilename() << "'";
+            Log(LOG_ERROR) << "   mod '" << script->getModIfo().getId() << "'";
+            Log(LOG_ERROR) << "   path '" << script->getModIfo().getPath() << "'";
+            continue;
+        }
+    }
+    return 0;
+}
+
 
 } //namespace Lua
 } //namespace OpenXcom

@@ -1,8 +1,25 @@
-//
-// Created by ken on 18/09/18.
-//
+/*
+ * Copyright 2010-2016 OpenXcom Developers.
+ *
+ * This file is part of OpenXcom.
+ *
+ * OpenXcom is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * OpenXcom is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#include "LuaGame.h"
 #include "LuaApi.h"
+#include "LuaScript.h"
 #include "../../Engine/Game.h"
 #include "../../Engine/State.h"
 #include "../../Engine/Logger.h"
@@ -19,30 +36,9 @@ extern "C" {
 namespace OpenXcom {
 namespace Lua {
 
-Game* getGame(lua_State* luaState)
-{
-    //get the game pointer
-    lua_pushglobaltable(luaState);
-
-    lua_pushstring(luaState, "xcom");
-    lua_gettable(luaState, -2);
-
-    Game* game = nullptr;
-    lua_getfield(luaState, -1, "__self");
-    if(lua_isuserdata(luaState, -1))
-    {
-        game = *static_cast<Game**>(lua_touserdata(luaState, -1));
-    }
-
-    lua_pop(luaState, 3);
-
-    return game;
-}
-
-
 static int lua_gameGetFunds(lua_State* luaState)
 {
-    Game* game = getGame(luaState);
+    Game* game = getGameFromLuaState(luaState);
 
     int funds = 0;
     if(game != nullptr)
@@ -61,7 +57,7 @@ static int lua_gameSetFunds(lua_State* luaState)
         return luaL_error(luaState, "setFunds(number funds) takes 1 argument.");
     }
 
-    Game* game = getGame(luaState);
+    Game* game = getGameFromLuaState(luaState);
 
     int funds = luaL_checknumber(luaState, 1);
     if(game != nullptr)
@@ -73,7 +69,7 @@ static int lua_gameSetFunds(lua_State* luaState)
 }
 
 /// Given a lua context, insert the "xcom.game" lua API bindings
-void loadXcomGameLuaLib(lua_State* luaState, Game* game)
+void LuaGameBindings::loadXcomGameLuaLib(lua_State* luaState, Game* game)
 {
     // __self is located in the root xcom table because it's used frequently and this makes it easier to access
     lua_pushstring(luaState, "__self");

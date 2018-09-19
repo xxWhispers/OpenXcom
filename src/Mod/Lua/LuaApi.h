@@ -18,30 +18,54 @@
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vector>
+#include <string>
+#include "LuaGeoscape.h"
+
 // predeclaration
 typedef struct lua_State lua_State;
 
 
 namespace OpenXcom
 {
-
 class Game;
+namespace FileMap {
+    class FileModInfo;
+}
 
 namespace Lua
 {
+class LuaScript;
 
-/// Given a lua context, insert the "xcom" lua API bindings
-void loadXcomLuaLib(lua_State* luaState, Game* game);
+class LuaApi
+{
+protected:
+    std::vector<LuaScript*> _luaScripts;
+    LuaScript* _currentScript;
 
-/// Helpers
+    LuaGeoscapeBindings _geoscapeBindings;
 
-/// Given a lua context, insert the "xcom.game" lua API bindings
-void loadXcomGameLuaLib(lua_State* luaState, Game* game);
-/// Given a lua context, insert the "xcom.geoscape" lua API bindings
-void loadXcomGeoscapeLuaLib(lua_State* luaState);
+public:
+    LuaApi();
+    ~LuaApi();
 
-/// helper function to load the game object from the lua state
-Game* getGame(lua_State* luaState);
+    /// Adds a script to be run
+    void registerScript(const FileMap::FileModInfo &info, const std::string& file_relative_path);
+
+    /// Load all the registered scripts
+    int loadScripts(Game* game);
+    /// Run all the loaded scripts
+    int runScripts();
+    /// Unload all the loaded scripts
+    int unloadScripts();
+
+    /// Get the geoscape bindings
+    LuaGeoscapeBindings& getGeoscapeBindings() { return _geoscapeBindings; }
+
+    /// get the current executing script(TODO: maybe a restrict protected friends classes because not sure everyone needs to know)
+    inline LuaScript* getCurrentScript() const { return _currentScript; }
+    inline void setCurrentScript(LuaScript* script) { _currentScript = script; }
+};
 
 }
 }

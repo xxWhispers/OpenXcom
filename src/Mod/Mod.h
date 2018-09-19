@@ -27,6 +27,7 @@
 #include "RuleDamageType.h"
 #include "Unit.h"
 #include "RuleAlienMission.h"
+#include "Lua/LuaApi.h"
 
 namespace OpenXcom
 {
@@ -90,9 +91,12 @@ class ScriptParserBase;
 class ScriptGlobal;
 struct StatAdjustment;
 
-class ModLuaScript;
 namespace FileMap {
 	class FileModInfo;
+}
+
+namespace Lua {
+    class LuaApi;
 }
 
 /**
@@ -216,7 +220,7 @@ private:
 	size_t _soundOffsetBattle = 0;
 	size_t _soundOffsetGeo = 0;
 
-	std::vector<ModLuaScript*> _luaScripts;
+	Lua::LuaApi* _luaApi;
 
 	/// Loads a ruleset from a YAML file.
 	void loadFile(const FileMap::FileModInfo& modInfo, const std::string &filename, ModScript &parsers);
@@ -644,7 +648,8 @@ public:
 	int getDefeatScore() const;
 	int getDefeatFunds() const;
 
-	const std::vector<ModLuaScript*>& getLuaScripts() const { return _luaScripts; }
+	/// Get the LUA api which holds all the lua scripts and lua bindings
+    Lua::LuaApi* getLuaApi() const { return _luaApi; }
 };
 
 }

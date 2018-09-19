@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright 2010-2016 OpenXcom Developers.
  *
@@ -16,3 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with OpenXcom.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+// predeclaration
+typedef struct lua_State lua_State;
+
+namespace OpenXcom
+{
+class Game;
+namespace FileMap {
+    class FileModInfo;
+}
+
+namespace Lua
+{
+
+
+class LuaGameBindings
+{
+protected:
+    friend class LuaScript;
+    static void loadXcomGameLuaLib(lua_State *luaState, Game* game);
+};
+
+}
+}
+

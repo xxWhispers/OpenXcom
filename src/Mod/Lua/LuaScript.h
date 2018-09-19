@@ -19,6 +19,7 @@
  */
 
 #include <string>
+#include "LuaGeoscape.h"
 
 // predeclaration
 typedef struct lua_State lua_State;
@@ -31,17 +32,24 @@ namespace FileMap {
     class FileModInfo;
 }
 
-class ModLuaScript
+namespace Lua
 {
-private:
+
+class LuaScript
+{
+protected:
     const FileMap::FileModInfo& _modInfo;
     const std::string _file_relative_path;
 
     lua_State* _luaState;
 
+    /// Helpers
+    /// Given a lua context, insert the "xcom" lua API bindings
+    void loadXcomLuaLib(lua_State* luaState, Game* game);
+
 public:
-    ModLuaScript(const FileMap::FileModInfo& modInfo, const std::string& file_relative_path);
-    ~ModLuaScript();
+    LuaScript(const FileMap::FileModInfo& modInfo, const std::string& file_relative_path);
+    ~LuaScript();
 
     // Prepare the Lua context and load the script.
     int Load(Game* game);
@@ -52,6 +60,13 @@ public:
 
     const std::string& getFilename() const { return _file_relative_path; }
     const FileMap::FileModInfo& getModIfo() const { return _modInfo; }
+
+    inline lua_State* getLuaState() const { return _luaState; }
 };
 
-}
+/// helper function to load the game object from the lua state
+Game* getGameFromLuaState(lua_State* luaState);
+
+
+}   // end namespace Lua
+}   // end namespace OpenXcom
